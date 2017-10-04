@@ -1,0 +1,12 @@
+spring:
+  profiles:
+    active: dev
+
+zhuy: 
+      name: 张三
+      age: 18
+      number: ${random.int}
+      uuid: ${random.uuid}
+      max: ${random.int(10)}
+      value: ${random.value}
+      greeting: hi,i'm  ${zhuy.name}
