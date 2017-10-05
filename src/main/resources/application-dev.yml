@@ -8,6 +8,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/db_zhuy?useUnicode=true&characterEncoding=UTF-8
     
+    
 
 
      

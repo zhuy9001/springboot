@@ -5,43 +5,32 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.pgl.demo.dao.IStudentDao;
+import com.pgl.demo.dao.impl.StudentMapper;
 import com.pgl.demo.domain.Student;
-import com.pgl.demo.service.IStudentService;
 
 @Service
-public class StudentService implements IStudentService {
+public class StudentService {
 	
 	@Autowired
-	private IStudentDao studentDao;
-
-	@Override
-	public int add(Student student) {
-		// TODO Auto-generated method stub
-		return studentDao.add(student);
+	private StudentMapper studentMapper;
+	
+	public int add(String sname,String sex,int age) {
+		return studentMapper.add(sname, sex, age);
 	}
 
-	@Override
-	public int updata(Student student) {
-		return studentDao.updata(student);
+	public int update(String sname,String sex,int age,int sid) {
+		return studentMapper.update(sname, sex, age, sid);
 	}
-
-	@Override
+	
 	public int delete(int sid) {
-		// TODO Auto-generated method stub
-		return studentDao.delete(sid);
+		return studentMapper.delete(sid);
 	}
-
-	@Override
-	public Student getStudentById(int sid) {
-		// TODO Auto-generated method stub
-		return studentDao.getStudentById(sid);
+	
+	public Student findStudentById(int sid) {
+		return (Student) studentMapper.findStudentById(sid);
 	}
-
-	@Override
-	public List<Student> getStudentList() {
-		// TODO Auto-generated method stub
-		return studentDao.getStudentList();
+	
+	public List<Student> getStudentList(){
+		return studentMapper.getStudentList();
 	}
-
 }

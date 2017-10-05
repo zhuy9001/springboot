@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pgl.demo.domain.Student;
-import com.pgl.demo.service.IStudentService;
+import com.pgl.demo.service.impl.StudentService;
 
 @RestController
 @RequestMapping("/student")
 public class StudentController {
 	
 	@Autowired
-	private IStudentService studentService;
+	private StudentService studentService;
 	
 	@RequestMapping(value="/list",method=RequestMethod.POST)
 	public List<Student> getStudentList(){
@@ -26,7 +26,7 @@ public class StudentController {
 	
 	@RequestMapping(value="/{sid}",method=RequestMethod.GET)
 	public Student getStudent(@PathVariable("sid") int sid){
-		return studentService.getStudentById(sid);
+		return studentService.findStudentById(sid);
 	}
 
 	@RequestMapping(value = "/{sid}",method = RequestMethod.PUT)
@@ -37,7 +37,23 @@ public class StudentController {
 		student.setSname(name);
 		student.setSid(sid);
 		student.setSage(age);
-        int t=studentService.updata(student);
+        int t=studentService.update(name,sex,age,sid);
+        if(t==1){
+            return student.toString();
+        }else {
+            return "fail";
+        }
+    }
+	
+
+	@RequestMapping(value = "/add",method = RequestMethod.PUT)
+    public String addStudent(@RequestParam(value = "name",required = true)String name,
+    		@RequestParam(value = "age",required = true)int age,@RequestParam(value = "sex",required = true)String sex){
+		Student student=new Student();
+		student.setSsex(sex);
+		student.setSname(name);
+		student.setSage(age);
+        int t=studentService.add(name,sex,age);
         if(t==1){
             return student.toString();
         }else {
