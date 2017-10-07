@@ -18,7 +18,6 @@ public class StudentService {
 	@Transactional
 	public int add(String sname,String sex,int age) {
 		int i=studentMapper.add(sname, sex, age);
-		int m=i/0;
 		return i;
 	}
 
