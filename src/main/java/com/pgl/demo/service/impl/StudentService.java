@@ -3,6 +3,7 @@ package com.pgl.demo.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,10 +32,12 @@ public class StudentService {
 		return studentMapper.delete(sid);
 	}
 	
+	@Cacheable("Student")
 	public Student findStudentById(int sid) {
 		return (Student) studentMapper.findStudentById(sid);
 	}
 	
+	@Cacheable("Students")
 	public List<Student> getStudentList(){
 		return studentMapper.getStudentList();
 	}
