@@ -10,10 +10,14 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import com.pgl.demo.domain.Student;
-
+/**
+ * 
+ * @author Administrator
+ *
+ */
 @Mapper
 public interface StudentMapper {
-	
+
 	@Insert("insert into student(sname,ssex,sage) values(#{name},#{sex},#{age})")
 	int add(@Param("name") String name,@Param("sex") String sex,@Param("age") int age);
 	

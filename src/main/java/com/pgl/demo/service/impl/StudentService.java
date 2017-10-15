@@ -23,8 +23,8 @@ public class StudentService {
 	}
 
 	@Transactional
-	public int update(String sname,String sex,int age,int sid) {
-		return studentMapper.update(sname, sex, age, sid);
+	public int update(Student student) {
+		return studentMapper.update(student.getSname(), student.getSsex(), student.getSage(), student.getSid());
 	}
 	
 	@Transactional
