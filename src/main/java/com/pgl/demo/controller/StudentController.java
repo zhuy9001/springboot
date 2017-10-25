@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pgl.demo.domain.Student;
-import com.pgl.demo.service.impl.StudentService;
+import com.pgl.demo.service.impl.StudentServiceImpl;
 import com.pgl.demo.utils.ResultMsg;
 import com.pgl.demo.utils.ResultStatusCode;
 
@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiOperation;
 public class StudentController {
 
 	@Autowired
-	private StudentService studentService;
+	private StudentServiceImpl studentService;
 
 	@ApiOperation(value = "获取学生列表", notes = "获取学生列表")
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
