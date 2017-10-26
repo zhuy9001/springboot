@@ -1,10 +1,8 @@
 package com.pgl.demo.datasource;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -24,13 +22,16 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
 
 /**
- * 
- * 功能描述：动态数据源注册 
- * 启动动态数据源请在启动类中（如Start）
- * 添加 @Import(DynamicDataSourceRegister.class)
- */
+* 描述：功能描述：动态数据源注册 启动动态数据源请在启动类中（如Start）添加 @Import(DynamicDataSourceRegister.class)
+* @author zhuy
+*  邮箱: zhuyang@pgl-world.com
+*  创建时间：2017年10月26日 下午4:50:57
+*/
 public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar, EnvironmentAware {
 
 	private static final Logger logger = LoggerFactory.getLogger(DynamicDataSourceRegister.class);
@@ -40,12 +41,13 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
 
 	// 如配置文件中未指定数据源类型，使用该默认值
 	private static final Object DATASOURCE_TYPE_DEFAULT = "org.apache.tomcat.jdbc.pool.DataSource";
-	 
 
 	// 数据源
 	private DataSource defaultDataSource;
 	private Map<String, DataSource> customDataSources = new HashMap<>();
-
+	
+	
+	
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
 		Map<Object, Object> targetDataSources = new HashMap<Object, Object>();
@@ -79,7 +81,7 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
 	 * @param username
 	 * @param password
 	 * @return
-	 * @create  2017年7月26日
+	 * @create 2017年7月26日
 	 */
 	@SuppressWarnings("unchecked")
 	public DataSource buildDataSource(Map<String, Object> dsMap) {
@@ -90,12 +92,12 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
 
 			Class<? extends DataSource> dataSourceType;
 			dataSourceType = (Class<? extends DataSource>) Class.forName((String) type);
-
 			String driverClassName = dsMap.get("driver-class-name").toString();
 			String url = dsMap.get("url").toString();
 			String username = dsMap.get("username").toString();
 			String password = dsMap.get("password").toString();
 
+			
 			DataSourceBuilder factory = DataSourceBuilder.create().driverClassName(driverClassName).url(url)
 					.username(username).password(password).type(dataSourceType);
 			return factory.build();
@@ -111,37 +113,7 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
 	@Override
 	public void setEnvironment(Environment env) {
 		initDefaultDataSource(env);
-		//initCustomDataSourceInfo();
-		initCustomDataSources1(env);
-	}
-
-	private Map<String,Map<String,Object>> initCustomDataSourceInfo() {
-		Map<String,Map<String,Object>> map=new HashMap<>();
-		Connection conn=null;
-		PreparedStatement ps=null;
-		ResultSet rs=null;
-		try {
-			String sql="select * from datasource";
-			 conn=defaultDataSource.getConnection();
-			 ps=conn.prepareStatement(sql);
-			 rs=ps.executeQuery();
-			while(rs.next()){
-				Map<String,Object> dsMap=new HashMap<>();
-				String names=rs.getString("names");
-				dsMap.put("type", rs.getString("datatype"));
-				dsMap.put("driver-class-name", rs.getString("driverclassname"));
-				dsMap.put("url", rs.getString("url"));
-				dsMap.put("username", rs.getString("username"));
-				dsMap.put("password", rs.getString("password"));
-				map.put(names,dsMap);
-			}
-		} catch (SQLException e) {
-			logger.error("初始化更多的数据源出错");
-			e.printStackTrace();
-		}finally {
-			close(conn,ps,rs);
-		}
-		return map;
+		initCustomDataSources(env);
 	}
 
 	/**
@@ -200,24 +172,7 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
 	 */
 	private void initCustomDataSources(Environment env) {
 		// 读取配置文件获取更多数据源，也可以通过defaultDataSource读取数据库获取更多数据源
-		RelaxedPropertyResolver propertyResolver = new RelaxedPropertyResolver(env, "com.pgl.edi.datasource.");
-		String dsPrefixs = propertyResolver.getProperty("names");
-		for (String dsPrefix : dsPrefixs.split(",")) {// 多个数据源
-			Map<String, Object> dsMap = propertyResolver.getSubProperties(dsPrefix + ".");
-			DataSource ds = buildDataSource(dsMap);
-			customDataSources.put(dsPrefix, ds);
-			dataBinder(ds, env);
-		}
-	}
-	
-	/**
-	 * 初始化更多数据源
-	 *
-	 * @create 2017年7月26日
-	 */
-	private void initCustomDataSources1(Environment env) {
-		// 读取配置文件获取更多数据源，也可以通过defaultDataSource读取数据库获取更多数据源
-		/*RelaxedPropertyResolver propertyResolver = new RelaxedPropertyResolver(env, "com.pgl.edi.datasource.");
+		/*RelaxedPropertyResolver propertyResolver = new RelaxedPropertyResolver(env, "com.pgl.platform.datasource.");
 		String dsPrefixs = propertyResolver.getProperty("names");
 		for (String dsPrefix : dsPrefixs.split(",")) {// 多个数据源
 			Map<String, Object> dsMap = propertyResolver.getSubProperties(dsPrefix + ".");
@@ -225,42 +180,44 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
 			customDataSources.put(dsPrefix, ds);
 			dataBinder(ds, env);
 		}*/
-		Map<String,Map<String,Object>> map=initCustomDataSourceInfo();
-		for (String key : map.keySet()) {  
-		    Map<String, Object> dsMap = map.get(key);  
+		Map<String, Map<String, Object>> customInfo=getCustomDataSourceInfo();
+		for (String key : customInfo.keySet()) {  
+		    Map<String, Object> dsMap = customInfo.get(key);  
 		    DataSource ds = buildDataSource(dsMap);
 			customDataSources.put(key, ds);
 			dataBinder(ds, env); 
 		}  
-		
+	}
+
+	private Map<String, Map<String, Object>> getCustomDataSourceInfo() {
+		Map<String, Map<String, Object>> customMap = new HashMap<>();
+		String sql = "select type,`driver_class_name`,url,username,`password`,`dsname` from datasource where status=1";
+		JdbcTemplate jdbcTemplate=new JdbcTemplate(defaultDataSource);
+		List<DataSourceInfo> infos=jdbcTemplate.query(sql, new RowMapper<DataSourceInfo>() {
+			@Override
+			public DataSourceInfo mapRow(ResultSet rs, int rowNum) throws SQLException {
+				DataSourceInfo info=new DataSourceInfo();
+				info.setType(rs.getString("type"));
+				info.setDriverClassName(rs.getString("driver_class_name"));
+				info.setUrl(rs.getString("url"));
+				info.setPassword(rs.getString("password"));
+				info.setUsername(rs.getString("username"));
+				info.setDsName(rs.getString("dsname"));
+				return info;
+			}
+		});
+		for(DataSourceInfo info:infos) {
+			Map<String, Object> dsMap = new HashMap<>();
+			dsMap.put("type", info.getType());
+			dsMap.put("driver-class-name", info.getDriverClassName());
+			dsMap.put("url", info.getUrl());
+			dsMap.put("username", info.getUsername());
+			dsMap.put("password", info.getPassword());
+			customMap.put(info.getDsName(), dsMap);
+		}
+		jdbcTemplate=null;
+		return customMap;
 	}
 	
-	private void close(Connection conn,PreparedStatement ps,ResultSet rs) {
-		
-		if(rs!=null) {
-			try {
-				rs.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		if(ps!=null) {
-			try {
-				ps.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		if(conn!=null) {
-			try {
-				conn.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
 
 }

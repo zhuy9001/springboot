@@ -13,5 +13,7 @@ public interface StudentService {
 	public int delete(int sid);
 	public Student findStudentById(int sid);
 	public List<Student> getStudentList();
+	
+	public void updateDataSource() ;
 
 }
