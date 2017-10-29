@@ -3,6 +3,7 @@ package com.pgl.demo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 
 import com.pgl.demo.datasource.DynamicDataSourceRegister;
@@ -14,6 +15,7 @@ import com.pgl.demo.datasource.DynamicDataSourceRegister;
  */
 @SpringBootApplication
 @EnableCaching
+@EnableAspectJAutoProxy(exposeProxy = true)
 @Import(DynamicDataSourceRegister.class)
 public class DemoApplication {
 

@@ -11,9 +11,10 @@ public interface StudentService {
 	public int add(String sname,String sex,int age);
 	public int update(Student student);
 	public int delete(int sid);
-	public Student findStudentById(int sid);
-	public List<Student> getStudentList();
+	public Student findStudentById(String ds,int sid);
+	public List<Student> getStudentList(String ds);
 	
+	public int addToFromDB(String ds,String sname,String sex,int age);
 	public void updateDataSource() ;
 
 }

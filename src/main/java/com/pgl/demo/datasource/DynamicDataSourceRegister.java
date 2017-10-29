@@ -215,7 +215,6 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
 			dsMap.put("password", info.getPassword());
 			customMap.put(info.getDsName(), dsMap);
 		}
-		jdbcTemplate=null;
 		return customMap;
 	}
 	

@@ -7,11 +7,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pgl.demo.domain.Student;
+import com.pgl.demo.service.StudentService;
 import com.pgl.demo.service.impl.StudentServiceImpl;
+import com.pgl.demo.service.impl.StudentServiceImplOne;
 import com.pgl.demo.utils.ResultMsg;
 import com.pgl.demo.utils.ResultStatusCode;
 
@@ -25,11 +26,13 @@ public class StudentController {
 
 	@Autowired
 	private StudentServiceImpl studentService;
+	@Autowired
+	private StudentServiceImplOne studentServiceImpl;
 
 	@ApiOperation(value = "获取学生列表", notes = "获取学生列表")
-	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public ResultMsg getStudentList() {
-		List<Student> list=studentService.getStudentList();
+	@RequestMapping(value = "/list/{dbname}", method = RequestMethod.GET)
+	public ResultMsg getStudentList(@PathVariable String dbname) {
+		List<Student> list=studentService.getStudentList(dbname);
 		return new ResultMsg(ResultStatusCode.OK.getErrcode(), ResultStatusCode.OK.getErrmsg(), list);
 	}
 
@@ -37,7 +40,7 @@ public class StudentController {
 	@ApiImplicitParam(name = "sid", value = "学生编号", required = true, dataType = "int")
 	@RequestMapping(value = "/{sid}", method = RequestMethod.GET)
 	public ResultMsg getStudent(@PathVariable("sid") int sid) {
-        Student student=studentService.findStudentById(sid);
+        Student student=studentService.findStudentById("wold",sid);
 		return new ResultMsg(ResultStatusCode.OK.getErrcode(), ResultStatusCode.OK.getErrmsg(), student);
 	}
 
@@ -46,7 +49,7 @@ public class StudentController {
 			@ApiImplicitParam(name = "sid", value = "学生编号", required = true, dataType = "int") })
 	@RequestMapping(value = "/update", method = RequestMethod.PUT)
 	public ResultMsg updateStudent(@RequestBody Student student) {
-		Student stu = studentService.findStudentById(student.getSid());
+		Student stu = studentService.findStudentById("wold",student.getSid());
 		if (stu == null) {
 			return new ResultMsg(ResultStatusCode.NULL_OBJ.getErrcode(), ResultStatusCode.NULL_OBJ.getErrmsg(),
 					student);
@@ -71,12 +74,22 @@ public class StudentController {
 		ResultMsg resultMsg = new ResultMsg(ResultStatusCode.OK.getErrcode(), ResultStatusCode.OK.getErrmsg(), student);
 		return resultMsg;
 	}
+	
+	@RequestMapping(value = "/addStudent", method = RequestMethod.POST)
+	public ResultMsg addStudentFromDB(@RequestBody Student student) {
+		//studentServiceImpl.addToFromDB("shiro",student.getSname(), student.getSsex(), student.getSage());
+		//List<Student> stu =studentService.getStudentList("sampledb");
+		Student stu=studentServiceImpl.findStudentById("sampledb",1);
+		ResultMsg resultMsg = new ResultMsg(ResultStatusCode.OK.getErrcode(), ResultStatusCode.OK.getErrmsg(), stu);
+		return resultMsg;
+	}
+
 
 	@ApiOperation(value = "删除学生信息", notes = "根据学生编号删除学生信息")
 	@ApiImplicitParam(name = "sid", value = "学生编号", required = true, dataType = "int")
 	@RequestMapping(value = "/delete/{sid}", method = RequestMethod.DELETE)
 	public ResultMsg deleteStudent(@PathVariable("sid") int sid) {
-		Student stu = studentService.findStudentById(sid);
+		Student stu = studentService.findStudentById("wold",sid);
 		int m=studentService.delete(sid);
 		if(m>0) {
 			return new ResultMsg(ResultStatusCode.OK.getErrcode(), ResultStatusCode.OK.getErrmsg(), stu);

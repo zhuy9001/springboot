@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pgl.demo.dao.impl.StudentMapper;
-import com.pgl.demo.datasource.DataSource;
 import com.pgl.demo.datasource.DynamicDataSource;
 import com.pgl.demo.domain.Student;
 import com.pgl.demo.service.StudentService;
@@ -21,6 +20,9 @@ public class StudentServiceImpl implements StudentService {
 
 	@Autowired
 	private StudentMapper studentMapper;
+	
+	@Autowired
+	private  StudentServiceImpl studentServiceImpl;
 
 	@Transactional
 	@Override
@@ -41,18 +43,25 @@ public class StudentServiceImpl implements StudentService {
 		return studentMapper.delete(sid);
 	}
 
-	@DataSource(name = "sampledb")
 	@Override
-	public Student findStudentById(int sid) {
+	public Student findStudentById(String ds,int sid) {
 		return (Student) studentMapper.findStudentById(sid);
 	}
 
 	@Override
-	public List<Student> getStudentList() {
-		updateDataSource();
-		return studentMapper.getStudentList();
+	public List<Student> getStudentList(String ds) {
+		//updateDataSource();
+		System.out.println("进来了");
+		return studentServiceImpl.findStudentListFromDB(ds);
 	}
 
+
+	protected List<Student> findStudentListFromDB(String ds){
+		System.out.println("进来了1111111");
+		return studentMapper.getStudentList();
+	}
+	
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void updateDataSource() {
@@ -93,4 +102,11 @@ public class StudentServiceImpl implements StudentService {
 		// mpv.addPropertyValue("targetDataSources", "");
 		// registry.registerBeanDefinition("dataSource", beanDefinition);
 	}
+
+	@Override
+	public int addToFromDB(String ds, String sname, String sex, int age) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
 }
