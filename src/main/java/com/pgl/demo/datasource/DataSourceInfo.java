@@ -16,6 +16,8 @@ public class DataSourceInfo {
 	private String dsName;
 	private String status;
 	private String alias;
+	private String property;
+	private String propertyStatus;
 	public int getId() {
 		return id;
 	}
@@ -70,12 +72,27 @@ public class DataSourceInfo {
 	public void setAlias(String alias) {
 		this.alias = alias;
 	}
+	
+	public String getProperty() {
+		return property;
+	}
+	public void setProperty(String property) {
+		this.property = property;
+	}
+	public String getPropertyStatus() {
+		return propertyStatus;
+	}
+	public void setPropertyStatus(String propertyStatus) {
+		this.propertyStatus = propertyStatus;
+	}
 	@Override
 	public String toString() {
 		return "DataSourceInfo [id=" + id + ", type=" + type + ", driverClassName=" + driverClassName + ", url=" + url
 				+ ", username=" + username + ", password=" + password + ", dsName=" + dsName + ", status=" + status
-				+ ", alias=" + alias + "]";
+				+ ", alias=" + alias + ", property=" + property + ", propertyStatus=" + propertyStatus + "]";
 	}
+
+	
 	
 	 
 
