@@ -1,3 +1,35 @@
 server:
   port: 8080
   context-path: /demo
+spring:
+  datasource:
+    password: root1234
+    username: root
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/db_zhuy?useUnicode=true&characterEncoding=UTF-8
+    type: com.alibaba.druid.pool.DruidDataSource
+com: 
+   pgl: 
+     edi:  
+       datasource: 
+         names: shiro,sampledb
+         shiro:  
+            driver-class-name: com.mysql.jdbc.Driver
+            password: root1234
+            username: root
+            url: jdbc:mysql://127.0.0.1:3306/shiro?useUnicode=true&characterEncoding=UTF-8
+            type: com.alibaba.druid.pool.DruidDataSource
+         sampledb:  
+            driver-class-name: com.mysql.jdbc.Driver
+            password: root1234
+            username: root
+            url: jdbc:mysql://127.0.0.1:3306/sampledb?useUnicode=true&characterEncoding=UTF-8
+            type: com.alibaba.druid.pool.DruidDataSource
+logging: 
+  level:
+    com.pgl.demo.dao.impl: debug
+    
+    
+
+
+     
